@@ -6,10 +6,10 @@
 // GraphBellmanFord - Bellman-Ford Algorithm
 //
 
-// Student Name : Francisco Ribeiro
-// Student Number : 118993
 // Student Name : Catarina Rabaça
 // Student Number : 119582
+// Student Name : Francisco Ribeiro
+// Student Number : 118993
 
 /*** COMPLETE THE GraphBellmanFordAlgExecute FUNCTION ***/
 
@@ -33,41 +33,74 @@ struct _GraphBellmanFordAlg {
   unsigned int startVertex;  // The root of the shortest-paths tree
 };
 
+
+
+// Função auxiliar para verificar se existe uma aresta entre dois vértices
+static int hasEdge(const Graph* g, unsigned int u, unsigned int v) {
+  unsigned int* adjacencies = GraphGetAdjacentsTo(g, u);
+  unsigned int numAdjacencies = adjacencies[0];  // Primeiro elemento é o número de adjacências
+
+  for (unsigned int i = 1; i <= numAdjacencies; i++) {  // Percorrer os adjacentes
+    if (adjacencies[i] == v) {
+      free(adjacencies);  // Liberta a memória alocada pela função
+      return 1;  // Aresta encontrada
+    }
+  }
+
+  free(adjacencies);  // Liberta a memória alocada pela função
+  return 0;  // Não existe aresta
+}
+
 GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g,
                                                 unsigned int startVertex) {
   assert(g != NULL);
   assert(startVertex < GraphGetNumVertices(g));
-  assert(GraphIsWeighted(g) == 0);
+  assert(GraphIsWeighted(g) == 0);  // Garantir que o grafo não tem pesos
 
+  // Alocar e inicializar estrutura principal
   GraphBellmanFordAlg* result =
       (GraphBellmanFordAlg*)malloc(sizeof(struct _GraphBellmanFordAlg));
   assert(result != NULL);
 
-  // Given graph and start vertex for the shortest-paths
+  unsigned int numVertices = GraphGetNumVertices(g);
   result->graph = g;
   result->startVertex = startVertex;
 
-  unsigned int numVertices = GraphGetNumVertices(g);
+  // Inicializar arrays principais
+  result->marked = (unsigned int*)calloc(numVertices, sizeof(unsigned int));
+  result->distance = (int*)malloc(numVertices * sizeof(int));
+  result->predecessor = (int*)malloc(numVertices * sizeof(int));
 
-  //
-  // TO BE COMPLETED !!
-  //
-  // CREATE AND INITIALIZE
-  // result->marked
-  // result->distance
-  // result->predecessor
-  //
+  for (unsigned int i = 0; i < numVertices; i++) {
+    result->distance[i] = -1;  // Inicialmente, nenhuma distância é conhecida
+    result->predecessor[i] = -1;  // Sem predecessores conhecidos
+  }
 
-  // Mark all vertices as not yet visited, i.e., ZERO
-  
-  // No vertex has (yet) a (valid) predecessor
-  
-  // No vertex has (yet) a (valid) distance to the start vertex
-  
-  // THE ALGORTIHM TO BUILD THE SHORTEST-PATHS TREE
+  result->distance[startVertex] = 0;  // Distância inicial
+  result->marked[startVertex] = 1;   // Vértice inicial alcançado
 
-  return NULL;
+  // Algoritmo de Bellman-Ford
+  for (unsigned int k = 0; k < numVertices - 1; k++) {  // |V| - 1 iterações
+    for (unsigned int u = 0; u < numVertices; u++) {
+      if (result->marked[u]) {  // Apenas vértices marcados
+        for (unsigned int v = 0; v < numVertices; v++) {
+          if (hasEdge(g, u, v)) {  // Verificar se há aresta entre u e v
+            int newDistance = result->distance[u] + 1;  // Peso é 1
+            if (result->distance[v] == -1 || newDistance < result->distance[v]) {
+              result->distance[v] = newDistance;
+              result->predecessor[v] = u;
+              result->marked[v] = 1;  // Marca v como alcançado
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return result;
 }
+
+
 
 void GraphBellmanFordAlgDestroy(GraphBellmanFordAlg** p) {
   assert(*p != NULL);
