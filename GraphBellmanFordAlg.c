@@ -11,8 +11,6 @@
 // Student Name : Francisco Ribeiro
 // Student Number : 118993
 
-/*** COMPLETE THE GraphBellmanFordAlgExecute FUNCTION ***/
-
 #include "GraphBellmanFordAlg.h"
 
 #include <assert.h>
@@ -33,31 +31,12 @@ struct _GraphBellmanFordAlg {
   unsigned int startVertex;  // The root of the shortest-paths tree
 };
 
-
-
-// Função auxiliar para verificar se existe uma aresta entre dois vértices
-static int hasEdge(const Graph* g, unsigned int u, unsigned int v) {
-  unsigned int* adjacencies = GraphGetAdjacentsTo(g, u);
-  unsigned int numAdjacencies = adjacencies[0];  // Primeiro elemento é o número de adjacências
-
-  for (unsigned int i = 1; i <= numAdjacencies; i++) {  // Percorrer os adjacentes
-    if (adjacencies[i] == v) {
-      free(adjacencies);  // Liberta a memória alocada pela função
-      return 1;  // Aresta encontrada
-    }
-  }
-
-  free(adjacencies);  // Liberta a memória alocada pela função
-  return 0;  // Não existe aresta
-}
-
-GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g,
-                                                unsigned int startVertex) {
+GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g, unsigned int startVertex) {
   assert(g != NULL);
   assert(startVertex < GraphGetNumVertices(g));
-  assert(GraphIsWeighted(g) == 0);  // Garantir que o grafo não tem pesos
+  assert(GraphIsWeighted(g) == 0);  // O grafo deve ser não ponderado
 
-  // Alocar e inicializar estrutura principal
+  // Inicializar estrutura principal
   GraphBellmanFordAlg* result =
       (GraphBellmanFordAlg*)malloc(sizeof(struct _GraphBellmanFordAlg));
   assert(result != NULL);
@@ -66,40 +45,60 @@ GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g,
   result->graph = g;
   result->startVertex = startVertex;
 
-  // Inicializar arrays principais
+  // Alocar e inicializar os arrays principais
   result->marked = (unsigned int*)calloc(numVertices, sizeof(unsigned int));
   result->distance = (int*)malloc(numVertices * sizeof(int));
   result->predecessor = (int*)malloc(numVertices * sizeof(int));
 
   for (unsigned int i = 0; i < numVertices; i++) {
-    result->distance[i] = -1;  // Inicialmente, nenhuma distância é conhecida
-    result->predecessor[i] = -1;  // Sem predecessores conhecidos
+    result->distance[i] = -1;  // Nenhuma distância conhecida
+    result->predecessor[i] = -1;  // Sem predecessores
   }
 
-  result->distance[startVertex] = 0;  // Distância inicial
-  result->marked[startVertex] = 1;   // Vértice inicial alcançado
+  result->distance[startVertex] = 0;  // Vértice inicial tem distância 0
 
-  // Algoritmo de Bellman-Ford
+  // Pré-processar arestas do grafo
+  unsigned int totalEdges = 0;
+  unsigned int** edgeList = (unsigned int**)malloc(numVertices * sizeof(unsigned int*));
+  unsigned int* edgeCount = (unsigned int*)calloc(numVertices, sizeof(unsigned int));
+
+  for (unsigned int u = 0; u < numVertices; u++) {
+    unsigned int* adjacencies = GraphGetAdjacentsTo(g, u);
+    edgeList[u] = adjacencies;
+    edgeCount[u] = adjacencies[0];
+    totalEdges += adjacencies[0];
+  }
+
+  // Bellman-Ford
   for (unsigned int k = 0; k < numVertices - 1; k++) {  // |V| - 1 iterações
     for (unsigned int u = 0; u < numVertices; u++) {
-      if (result->marked[u]) {  // Apenas vértices marcados
-        for (unsigned int v = 0; v < numVertices; v++) {
-          if (hasEdge(g, u, v)) {  // Verificar se há aresta entre u e v
-            int newDistance = result->distance[u] + 1;  // Peso é 1
-            if (result->distance[v] == -1 || newDistance < result->distance[v]) {
-              result->distance[v] = newDistance;
-              result->predecessor[v] = u;
-              result->marked[v] = 1;  // Marca v como alcançado
-            }
+      if (result->distance[u] != -1) {  // Apenas vértices alcançados
+        for (unsigned int i = 1; i <= edgeCount[u]; i++) {
+          unsigned int v = edgeList[u][i];
+          int newDistance = result->distance[u] + 1;  // Peso = 1
+          if (result->distance[v] == -1 || newDistance < result->distance[v]) {
+            result->distance[v] = newDistance;
+            result->predecessor[v] = u;
           }
         }
       }
     }
   }
 
+  // Liberar memória temporária
+  for (unsigned int u = 0; u < numVertices; u++) {
+    free(edgeList[u]);
+  }
+  free(edgeList);
+  free(edgeCount);
+
   return result;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4c9152ab2ebc82c59efd0383dd11cd9cef6ca28a
 void GraphBellmanFordAlgDestroy(GraphBellmanFordAlg** p) {
   assert(*p != NULL);
 
@@ -128,6 +127,7 @@ int GraphBellmanFordAlgDistance(const GraphBellmanFordAlg* p, unsigned int v) {
 
   return p->distance[v];
 }
+
 Stack* GraphBellmanFordAlgPathTo(const GraphBellmanFordAlg* p, unsigned int v) {
   assert(p != NULL);
   assert(v < GraphGetNumVertices(p->graph));

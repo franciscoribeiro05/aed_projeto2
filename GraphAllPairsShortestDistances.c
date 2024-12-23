@@ -6,10 +6,10 @@
 // GraphAllPairsShortestDistances
 //
 
-// Student Name :
-// Student Number :
-// Student Name :
-// Student Number :
+// Student Name : Catarina Rabaça
+// Student Number : 119582
+// Student Name : Francisco Ribeiro
+// Student Number : 118993
 
 /*** COMPLETE THE GraphAllPairsShortestDistancesExecute FUNCTION ***/
 
@@ -29,15 +29,49 @@ struct _GraphAllPairsShortestDistances {
   Graph* graph;
 };
 
-// Allocate memory and initialize the distance matrix
-// Compute the distances between vertices by running the Bellman-Ford algorithm
+// Alocar memória e inicializar a matriz de distâncias
+// Calcular as distâncias entre os vértices executando o algoritmo de Bellman-Ford
 GraphAllPairsShortestDistances* GraphAllPairsShortestDistancesExecute(
     Graph* g) {
-  assert(g != NULL);
+  assert(g != NULL); // Certificar que o grafo fornecido não é nulo
 
-  // COMPLETE THE CODE
+  // Alocam memória para a estrutura principal
+  GraphAllPairsShortestDistances* result =
+      (GraphAllPairsShortestDistances*)malloc(
+          sizeof(struct _GraphAllPairsShortestDistances));
+  assert(result != NULL); // Garantem que a memória foi alocada com sucesso
 
-  return NULL;
+  unsigned int numVertices = GraphGetNumVertices(g);
+  result->graph = g; // Guardam o grafo original na estrutura
+
+  // Alocam a matriz de distâncias (array de ponteiros para linhas)
+  result->distance = (int**)malloc(numVertices * sizeof(int*));
+  assert(result->distance != NULL); // Garantem que a memória foi alocada
+
+  for (unsigned int i = 0; i < numVertices; i++) {
+    result->distance[i] = (int*)malloc(numVertices * sizeof(int));
+    assert(result->distance[i] != NULL); // Garantem que cada linha foi alocada
+
+    for (unsigned int j = 0; j < numVertices; j++) {
+      result->distance[i][j] = -1; // Inicializam todas as distâncias como indefinidas (-1)
+    }
+  }
+
+  // Iteram sobre todos os vértices para calcular as distâncias mais curtas
+  for (unsigned int i = 0; i < numVertices; i++) {
+    // Executam o algoritmo de Bellman-Ford a partir do vértice i
+    GraphBellmanFordAlg* bfResult = GraphBellmanFordAlgExecute(g, i);
+
+    for (unsigned int j = 0; j < numVertices; j++) {
+      result->distance[i][j] = GraphBellmanFordAlgDistance(bfResult, j);
+      // Guardam a distância calculada do vértice i para o vértice j
+    }
+
+    // Libertam a memória usada pela execução de Bellman-Ford
+    GraphBellmanFordAlgDestroy(&bfResult);
+  }
+
+  return result; // Retornam a estrutura preenchida com a matriz de distâncias
 }
 
 void GraphAllPairsShortestDistancesDestroy(GraphAllPairsShortestDistances** p) {
