@@ -100,8 +100,6 @@ GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g,
   return result;
 }
 
-
-
 void GraphBellmanFordAlgDestroy(GraphBellmanFordAlg** p) {
   assert(*p != NULL);
 
