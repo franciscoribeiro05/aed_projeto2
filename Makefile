@@ -6,7 +6,8 @@
 CFLAGS += -g -Wall -Wextra
 
 TARGETS = TestAllPairsShortestDistances TestBellmanFordAlg \
- TestCreateTranspose TestEccentricityMeasures TestTransitiveClosure
+ TestCreateTranspose TestEccentricityMeasures TestTransitiveClosure \
+ teste2_bellmanford
 
 all: $(TARGETS)
 
@@ -24,6 +25,9 @@ TestEccentricityMeasures: TestEccentricityMeasures.o Graph.o GraphBellmanFordAlg
 
 TestTransitiveClosure: TestTransitiveClosure.o Graph.o GraphBellmanFordAlg.o \
  GraphTransitiveClosure.o IntegersStack.o SortedList.o instrumentation.o
+
+teste2_bellmanford: teste2_bellmanford.o Graph.o GraphBellmanFordAlg.o \
+ IntegersStack.o SortedList.o instrumentation.o
 
 # Dependencies of source files
 
@@ -62,8 +66,10 @@ TestCreateTranspose.o: TestCreateTranspose.c Graph.h instrumentation.h
 TestTransitiveClosure.o: TestTransitiveClosure.c Graph.h GraphBellmanFordAlg.h \
  GraphTransitiveClosure.h instrumentation.h
 
+teste2_bellmanford.o: teste2_bellmanford.c Graph.h GraphBellmanFordAlg.h \
+ IntegersStack.h SortedList.h instrumentation.h
+
 clean:
 	rm -f *.o
 	rm -f $(TARGETS)
-
 

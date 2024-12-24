@@ -56,7 +56,7 @@ GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g, unsigned int startVert
   }
 
   result->distance[startVertex] = 0;  // Vértice inicial tem distância 0
-
+ result->marked[startVertex] = 1; // Vértice inicial alcançado
   // Pré-processar arestas do grafo
   unsigned int totalEdges = 0;
   unsigned int** edgeList = (unsigned int**)malloc(numVertices * sizeof(unsigned int*));
@@ -79,6 +79,8 @@ GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g, unsigned int startVert
           if (result->distance[v] == -1 || newDistance < result->distance[v]) {
             result->distance[v] = newDistance;
             result->predecessor[v] = u;
+          result->predecessor[v] = u;
+          result->marked[v] = 1;  // Marca o vértice como alcançado
           }
         }
       }
@@ -94,6 +96,7 @@ GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g, unsigned int startVert
 
   return result;
 }
+
 
 void GraphBellmanFordAlgDestroy(GraphBellmanFordAlg** p) {
   assert(*p != NULL);
@@ -185,3 +188,4 @@ void GraphBellmanFordAlgDisplayDOT(const GraphBellmanFordAlg* p) {
   // Housekeeping
   GraphDestroy(&paths_tree);
 }
+
