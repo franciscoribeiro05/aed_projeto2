@@ -95,10 +95,6 @@ GraphBellmanFordAlg* GraphBellmanFordAlgExecute(Graph* g, unsigned int startVert
   return result;
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 4c9152ab2ebc82c59efd0383dd11cd9cef6ca28a
 void GraphBellmanFordAlgDestroy(GraphBellmanFordAlg** p) {
   assert(*p != NULL);
 
