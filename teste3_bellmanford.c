@@ -61,7 +61,7 @@ void run_performance_tests() {
     fprintf(fp, "vertices,density,execution_time\n");
     
     // Arrays com os tamanhos e densidades a testar
-    int sizes[] = {10, 50, 100, 200, 500, 1000};
+    int sizes[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000};
     double densities[] = {0.1, 0.3, 0.5, 0.7};
     
     // Número de repetições para cada combinação
